@@ -1,0 +1,70 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      VELO_LLVM_RELEASE: v1
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/checkout@v7
+        with:
+          repository: Gadgetoid/velo-toolchain
+          path: velo-toolchain
+
+      - name: Install CMake and mtools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake mtools
+
+      - name: Download the SH3 LLVM
+        run: |
+          name=velo-llvm-$VELO_LLVM_RELEASE-linux-x86_64
+          url=https://github.com/Gadgetoid/velo-llvm-builds/releases/download/$VELO_LLVM_RELEASE
+          curl -fsSLO $url/$name.tar.xz
+          curl -fsSLO $url/$name.tar.xz.sha256
+          sha256sum -c $name.tar.xz.sha256
+          tar xf $name.tar.xz -C "$RUNNER_TEMP"
+          echo "VELO_SH3_LLVM=$RUNNER_TEMP/$name" >> "$GITHUB_ENV"
+
+      - name: Build hlux and its card image, with no warnings
+        run: |
+          make card VELO_TOOLCHAIN="$GITHUB_WORKSPACE/velo-toolchain" VELO_SH3_LLVM="$VELO_SH3_LLVM" 2>&1 | tee build.log
+          ! grep -i "warning:" build.log
+
+      - name: Package
+        run: |
+          version=${GITHUB_REF_NAME//\//-}
+          mkdir dist
+          cp build/ce2-sh3/hlux.exe "dist/hlux-$version-sh3-ce2.exe"
+          (cd build && zip -9 "../dist/hlux-$version-card.zip" hlux.img)
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: hlux
+          path: dist/*
+
+  release:
+    if: github.ref_type == 'tag'
+    needs: [build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: hlux
+      - uses: softprops/action-gh-release@v3
+        with:
+          prerelease: ${{ contains(github.ref_name, '-') }}
+          files: |
+            *.exe
+            *.zip

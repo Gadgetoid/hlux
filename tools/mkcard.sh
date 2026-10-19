@@ -7,7 +7,6 @@ fi
 image=$1
 executable=$2
 autorun=$3
-sh3_emu=${SH3_EMU:-$(dirname "$0")/../../emu}
 if ! command -v mformat > /dev/null; then
     echo "mkcard.sh: needs mtools (brew install mtools, or apt install mtools)" >&2
     exit 1
@@ -34,4 +33,3 @@ if [ "$autorun" = --autorun ]; then
     mmd -i "$image@@512" ::/10003
     mcopy -i "$image@@512" -Q "$executable" ::/10003/AUTORUN.EXE
 fi
-python3 -I "$sh3_emu/tools/fatcase.py" "$image"
