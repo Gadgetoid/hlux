@@ -8,7 +8,7 @@ Tested only in [sh3-emu](https://github.com/Gadgetoid/sh3-emu) so far. I lack a 
 
 ## Why this works
 
-It started with someone asking why some Handheld PCs have odd colours, like the greys on this Sharp Mobilon HC-4600 with their blue and purple tinge:
+It started with [@RichsRandomRetroReviews](https://www.youtube.com/@RichsRandomRetroReviews) asking why some Handheld PCs have odd colours, like the greys on this Sharp Mobilon HC-4600 with their blue and purple tinge:
 
 ![A Sharp Mobilon HC-4600 screen with tinted greys](screenshots/hc4600.webp)
 
