@@ -11,33 +11,35 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      VELO_LLVM_RELEASE: v1
+      GRIMACE_COMMIT: 5120250dd63d8e5c8c1bae3335998ead9d1fc810
+      LLVM_RELEASE: v3
     steps:
       - uses: actions/checkout@v7
 
       - uses: actions/checkout@v7
         with:
-          repository: Gadgetoid/velo-toolchain
-          path: velo-toolchain
+          repository: grimace-sdk/grimace
+          ref: ${{ env.GRIMACE_COMMIT }}
+          path: grimace
 
       - name: Install CMake and mtools
         run: |
           sudo apt-get update
           sudo apt-get install -y cmake mtools
 
-      - name: Download the SH3 LLVM
+      - name: Download the Windows CE LLVM
         run: |
-          name=velo-llvm-$VELO_LLVM_RELEASE-linux-x86_64
-          url=https://github.com/Gadgetoid/velo-llvm-builds/releases/download/$VELO_LLVM_RELEASE
+          name=velo-llvm-$LLVM_RELEASE-linux-x86_64
+          url=https://github.com/grimace-sdk/llvm-builds/releases/download/$LLVM_RELEASE
           curl -fsSLO $url/$name.tar.xz
           curl -fsSLO $url/$name.tar.xz.sha256
           sha256sum -c $name.tar.xz.sha256
           tar xf $name.tar.xz -C "$RUNNER_TEMP"
-          echo "VELO_SH3_LLVM=$RUNNER_TEMP/$name" >> "$GITHUB_ENV"
+          echo "GRIMACE_LLVM=$RUNNER_TEMP/$name" >> "$GITHUB_ENV"
 
       - name: Build hlux and its card image, with no warnings
         run: |
-          make card VELO_TOOLCHAIN="$GITHUB_WORKSPACE/velo-toolchain" VELO_SH3_LLVM="$VELO_SH3_LLVM" 2>&1 | tee build.log
+          make card GRIMACE="$GITHUB_WORKSPACE/grimace" GRIMACE_LLVM="$GRIMACE_LLVM" 2>&1 | tee build.log
           ! grep -i "warning:" build.log
 
       - name: Package

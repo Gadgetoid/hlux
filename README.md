@@ -54,10 +54,10 @@ Releases have `hlux-VERSION-sh3-ce2.exe` and a CompactFlash card image (`hlux-VE
 
 ## Building
 
-Needs [velo-toolchain](https://github.com/Gadgetoid/velo-toolchain), an LLVM with the SuperH backend from [velo-llvm-builds](https://github.com/Gadgetoid/velo-llvm-builds/releases/tag/v1), and mtools for the card image.
+Needs [grimace](https://github.com/grimace-sdk/grimace), an LLVM with the SuperH backend from [llvm-builds](https://github.com/grimace-sdk/llvm-builds/releases/tag/v3), and mtools for the card image.
 
 ```sh
-make card VELO_TOOLCHAIN=../../velo-toolchain VELO_SH3_LLVM=/path/to/velo-llvm-v1-macos-arm64
+make card GRIMACE=/path/to/grimace GRIMACE_LLVM=/path/to/velo-llvm-v3-macos-arm64
 ```
 
 GitHub Actions builds every push and attaches the exe and card image to a release for each `v*` tag.
